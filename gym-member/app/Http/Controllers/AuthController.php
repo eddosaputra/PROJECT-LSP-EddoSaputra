@@ -55,8 +55,16 @@ class AuthController extends Controller
     // Menampilkan halaman register
     public function showRegister()
     {
-        return view('auth.register');
+    if (Auth::check()) {
+        if (Auth::user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('member.dashboard');
     }
+
+    return view('auth.register');
+}
 
     // Proses register
     public function register(Request $request)

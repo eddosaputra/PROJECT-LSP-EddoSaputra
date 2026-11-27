@@ -18,9 +18,9 @@
     <aside class="dashboard-sidebar">
 
         <!-- LOGO (NON-CLICKABLE) -->
-        <div class="dashboard-logo">
+        <a href="{{ route('home') }}" class="dashboard-logo">
             FIT<span>MEMBER</span><b>.</b>
-        </div>
+            </a>
 
         <div class="sidebar-label">MAIN MENU</div>
 

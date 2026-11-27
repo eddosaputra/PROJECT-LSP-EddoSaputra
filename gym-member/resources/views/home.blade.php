@@ -4,6 +4,16 @@
 
 @section('content')
 
+@php
+    if (auth()->check()) {
+        $dashboardUrl = auth()->user()->role === 'admin'
+            ? route('admin.dashboard')
+            : route('member.dashboard');
+    } else {
+        $dashboardUrl = route('register');
+    }
+@endphp
+
 @include('partials.navbar')
 
 <!-- HERO SECTION -->
@@ -29,7 +39,7 @@
 
                 <div class="d-flex gap-3 flex-wrap mt-4">
 
-                    <a href="{{ route('register') }}" class="gym-btn">
+                    <a href="{{ $dashboardUrl }}" class="gym-btn">
                         JOIN MEMBERSHIP
                         <i class="bi bi-arrow-right ms-2"></i>
                     </a>
@@ -191,7 +201,7 @@
                         </li>
                     </ul>
 
-                    <a href="{{ route('register') }}" class="gym-btn w-100 text-center">
+                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
                         GET STARTED
                     </a>
 
@@ -244,7 +254,7 @@
 
                     </ul>
 
-                    <a href="{{ route('register') }}" class="gym-btn w-100 text-center">
+                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
                         GET STARTED
                     </a>
 
@@ -293,7 +303,7 @@
 
                     </ul>
 
-                    <a href="{{ route('register') }}" class="gym-btn w-100 text-center">
+                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
                         GET STARTED
                     </a>
 
@@ -328,7 +338,7 @@
             Take the first step towards a stronger and healthier lifestyle.
         </p>
 
-        <a href="{{ route('register') }}" class="gym-btn mt-3">
+        <a href="{{ $dashboardUrl }}" class="gym-btn mt-3">
             BECOME A MEMBER
         </a>
 
