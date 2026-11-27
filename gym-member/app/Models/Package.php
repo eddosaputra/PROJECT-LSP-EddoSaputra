@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Package extends Model
+{
+    protected $fillable = [
+        'name',
+        'duration',
+        'price',
+        'description',
+        'is_active'
+    ];
+
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
+    }
+}
