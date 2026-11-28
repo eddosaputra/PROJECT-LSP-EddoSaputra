@@ -7,8 +7,8 @@
 @php
     if (auth()->check()) {
         $dashboardUrl = auth()->user()->role === 'admin'
-            ? route('admin.dashboard')
-            : route('member.dashboard');
+            ? route('admin.packages.index')
+            : route('member.dashboard') . '#memberships';
     } else {
         $dashboardUrl = route('register');
     }
@@ -95,12 +95,17 @@
         <div class="row align-items-center g-5">
 
             <div class="col-lg-6">
-
-                <img
-                    src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1000&q=80"
+                <video
                     class="img-fluid rounded"
-                    alt="Gym interior">
-
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    style="width: 100%; height: 335px; object-fit: cover;"
+                >
+                    <source src="{{ asset('videos/gym-member.mp4') }}" type="video/mp4">
+                    Browser Anda tidak mendukung pemutaran video.
+                </video>
             </div>
 
             <div class="col-lg-6">
@@ -167,150 +172,37 @@
         </div>
 
         <div class="row g-4">
+            @forelse($packages as $package)
+                <div class="col-md-4">
+                    <div class="gym-card rounded p-4 h-100">
+                        <h3>{{ $package->name }}</h3>
 
-            <!-- BASIC -->
-            <div class="col-md-4">
+                        @if($package->description)
+                            <p class="text-secondary">{{ $package->description }}</p>
+                        @endif
 
-                <div class="gym-card rounded p-4 h-100">
+                        <h2 class="my-4">
+                            Rp{{ number_format((float) $package->price, 0, ',', '.') }}
+                            <small class="fs-6 text-secondary">/ {{ $package->duration_days }} days</small>
+                        </h2>
 
-                    <h3>BASIC</h3>
-
-                    <p class="text-secondary">
-                        Perfect for starting your fitness journey.
-                    </p>
-
-                    <h2 class="my-4">
-                        Rp150.000
-                        <small class="fs-6 text-secondary">/ month</small>
-                    </h2>
-
-                    <ul class="list-unstyled text-secondary mb-4">
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Gym access
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Standard equipment
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Locker access
-                        </li>
-                    </ul>
-
-                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
-                        GET STARTED
-                    </a>
-
+                        <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
+                            GET STARTED
+                        </a>
+                    </div>
                 </div>
-
-            </div>
-
-
-            <!-- PREMIUM -->
-            <div class="col-md-4">
-
-                <div class="gym-card rounded p-4 h-100 border-danger">
-
-                    <span class="badge bg-danger mb-3">
-                        MOST POPULAR
-                    </span>
-
-                    <h3>PREMIUM</h3>
-
-                    <p class="text-secondary">
-                        More flexibility and better training experience.
-                    </p>
-
-                    <h2 class="my-4">
-                        Rp350.000
-                        <small class="fs-6 text-secondary">/ 3 months</small>
-                    </h2>
-
-                    <ul class="list-unstyled text-secondary mb-4">
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Full gym access
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            All standard equipment
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Locker access
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Personal consultation
-                        </li>
-
-                    </ul>
-
-                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
-                        GET STARTED
-                    </a>
-
+            @empty
+                <div class="col-12">
+                    <div class="gym-card rounded p-4 text-center">
+                        <p class="text-secondary mb-3">No active membership packages are available yet.</p>
+                        @if(auth()->check() && auth()->user()->role === 'admin')
+                            <a href="{{ route('admin.packages.index') }}" class="gym-btn">ADD A PACKAGE</a>
+                        @else
+                            <a href="{{ $dashboardUrl }}" class="gym-btn">GET STARTED</a>
+                        @endif
+                    </div>
                 </div>
-
-            </div>
-
-
-            <!-- ANNUAL -->
-            <div class="col-md-4">
-
-                <div class="gym-card rounded p-4 h-100">
-
-                    <h3>ANNUAL</h3>
-
-                    <p class="text-secondary">
-                        For those committed to long-term progress.
-                    </p>
-
-                    <h2 class="my-4">
-                        Rp1.200.000
-                        <small class="fs-6 text-secondary">/ year</small>
-                    </h2>
-
-                    <ul class="list-unstyled text-secondary mb-4">
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Unlimited gym access
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            All equipment
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Priority membership
-                        </li>
-
-                        <li class="mb-3">
-                            <i class="bi bi-check text-red"></i>
-                            Special member benefits
-                        </li>
-
-                    </ul>
-
-                    <a href="{{ $dashboardUrl }}" class="gym-btn w-100 text-center">
-                        GET STARTED
-                    </a>
-
-                </div>
-
-            </div>
-
+            @endforelse
         </div>
 
     </div>

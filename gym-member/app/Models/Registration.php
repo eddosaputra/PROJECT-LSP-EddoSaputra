@@ -9,12 +9,19 @@ class Registration extends Model
     protected $fillable = [
         'user_id',
         'package_id',
-        'phone',
-        'address',
-        'gender',
+        'start_date',
+        'end_date',
         'status',
-        'registration_date'
+        'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+        ];
+    }
 
     public function user()
     {
@@ -26,8 +33,8 @@ class Registration extends Model
         return $this->belongsTo(Package::class);
     }
 
-    public function payment()
+    public function payments()
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasMany(Payment::class)->latest();
     }
 }

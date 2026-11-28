@@ -16,6 +16,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'approval_status',
     ];
 
     protected $hidden = [
@@ -29,5 +30,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function registrations()
+    {
+        return $this->hasMany(Registration::class);
     }
 }

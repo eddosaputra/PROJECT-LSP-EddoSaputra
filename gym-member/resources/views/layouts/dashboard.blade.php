@@ -28,54 +28,54 @@
 
             @if(auth()->user()->role === 'admin')
 
-                <a href="{{ url('/admin/dashboard') }}" class="sidebar-link active">
+                <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('admin.dashboard') }}#pending-members" class="sidebar-link">
                     <i class="bi bi-people"></i>
                     <span>Members</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('admin.dashboard') }}#pending-payments" class="sidebar-link {{ request()->routeIs('admin.payments.*') ? 'active' : '' }}">
                     <i class="bi bi-credit-card"></i>
                     <span>Payments</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('admin.packages.index') }}" class="sidebar-link {{ request()->routeIs('admin.packages.*') ? 'active' : '' }}">
                     <i class="bi bi-card-checklist"></i>
                     <span>Membership Plans</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('admin.announcements.index') }}" class="sidebar-link {{ request()->routeIs('admin.announcements.*') ? 'active' : '' }}">
                     <i class="bi bi-megaphone"></i>
                     <span>Announcements</span>
                 </a>
 
             @else
 
-                <a href="{{ url('/member/dashboard') }}" class="sidebar-link active">
+                <a href="{{ route('member.dashboard') }}" class="sidebar-link {{ request()->routeIs('member.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-grid"></i>
                     <span>Dashboard</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#profile" class="sidebar-link">
                     <i class="bi bi-person"></i>
                     <span>My Profile</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#payment-history" class="sidebar-link">
                     <i class="bi bi-card-membership"></i>
                     <span>My Membership</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#memberships" class="sidebar-link">
                     <i class="bi bi-credit-card"></i>
                     <span>Payment History</span>
                 </a>
 
-                <a href="#" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#announcements" class="sidebar-link">
                     <i class="bi bi-megaphone"></i>
                     <span>Announcements</span>
                 </a>
@@ -130,6 +130,12 @@
             @if(session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger">
+                    {{ $errors->first() }}
                 </div>
             @endif
 

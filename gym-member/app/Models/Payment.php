@@ -10,10 +10,19 @@ class Payment extends Model
         'registration_id',
         'amount',
         'payment_method',
-        'payment_proof',
+        'proof_image',
         'status',
-        'payment_date'
+        'paid_at',
+        'notes',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'decimal:2',
+            'paid_at' => 'datetime',
+        ];
+    }
 
     public function registration()
     {

@@ -54,7 +54,7 @@
             <i class="bi bi-person-check"></i>
         </div>
 
-        <h2>0</h2>
+        <h2>{{ $activeMemberships }}</h2>
 
         <small>Active memberships</small>
     </div>
@@ -65,9 +65,9 @@
             <i class="bi bi-clock-history"></i>
         </div>
 
-        <h2>0</h2>
+        <h2>{{ $pendingMembers->count() + $pendingRegistrations->count() + $pendingPayments->count() }}</h2>
 
-        <small>Awaiting verification</small>
+        <small>Accounts, orders, and payments</small>
     </div>
 
     <div class="admin-stat-card">
@@ -76,7 +76,7 @@
             <i class="bi bi-calendar-x"></i>
         </div>
 
-        <h2>0</h2>
+        <h2>{{ $expiredMemberships }}</h2>
 
         <small>Expired memberships</small>
     </div>
@@ -92,7 +92,7 @@
 
 <div class="admin-action-grid">
 
-    <a href="#" class="admin-action-card">
+    <a href="{{ route('admin.dashboard') }}#pending-registrations" class="admin-action-card">
         <div class="admin-action-icon">
             <i class="bi bi-person-plus"></i>
         </div>
@@ -105,7 +105,7 @@
         <i class="bi bi-arrow-up-right action-arrow"></i>
     </a>
 
-    <a href="#" class="admin-action-card">
+    <a href="{{ route('admin.dashboard') }}#pending-payments" class="admin-action-card">
         <div class="admin-action-icon">
             <i class="bi bi-credit-card"></i>
         </div>
@@ -118,7 +118,7 @@
         <i class="bi bi-arrow-up-right action-arrow"></i>
     </a>
 
-    <a href="#" class="admin-action-card">
+    <a href="{{ route('admin.packages.index') }}" class="admin-action-card">
         <div class="admin-action-icon">
             <i class="bi bi-card-checklist"></i>
         </div>
@@ -131,7 +131,7 @@
         <i class="bi bi-arrow-up-right action-arrow"></i>
     </a>
 
-    <a href="#" class="admin-action-card">
+    <a href="{{ route('admin.announcements.index') }}" class="admin-action-card">
         <div class="admin-action-icon">
             <i class="bi bi-megaphone"></i>
         </div>
@@ -146,6 +146,164 @@
 
 </div>
 
+
+<!-- PENDING MEMBER APPROVALS -->
+<div class="dashboard-section-heading" id="pending-members">
+    <h3>Pending Member Approvals</h3>
+    <span>Review new membership applications</span>
+</div>
+
+<div class="dashboard-panel admin-table-panel">
+
+    <div class="admin-table-header">
+        <h4>Applications Awaiting Review</h4>
+        <span class="table-count">{{ $pendingMembers->count() }} pending</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table admin-member-table">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pendingMembers as $member)
+                    <tr>
+                        <td>
+                            <div class="table-member-name">
+                                <div class="table-avatar">
+                                    {{ strtoupper(substr($member->name, 0, 1)) }}
+                                </div>
+                                <strong>{{ $member->name }}</strong>
+                            </div>
+                        </td>
+                        <td>{{ $member->email }}</td>
+                        <td>{{ $member->phone ?? '-' }}</td>
+                        <td>{{ $member->created_at->format('d M Y') }}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form action="{{ route('admin.members.approval', $member) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="approval_status" value="approved">
+                                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
+                                </form>
+                                <form action="{{ route('admin.members.approval', $member) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="approval_status" value="rejected">
+                                    <button type="submit" class="btn btn-danger btn-sm">Reject</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="empty-table">No pending member applications.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- PENDING MEMBERSHIP ORDERS -->
+<div class="dashboard-section-heading mt-4" id="pending-registrations">
+    <h3>Membership Requests</h3>
+    <span>Approve or reject new package orders</span>
+</div>
+
+<div class="dashboard-panel admin-table-panel">
+    <div class="table-responsive">
+        <table class="table admin-member-table align-middle">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Package</th>
+                    <th>Price</th>
+                    <th>Requested</th>
+                    <th>Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pendingRegistrations as $registration)
+                    <tr>
+                        <td>{{ $registration->user->name }}<br><small>{{ $registration->user->email }}</small></td>
+                        <td>{{ $registration->package->name }}</td>
+                        <td>Rp{{ number_format((float) $registration->package->price, 0, ',', '.') }}</td>
+                        <td>{{ $registration->created_at->format('d M Y') }}</td>
+                        <td>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach(['approved' => 'Approve', 'rejected' => 'Reject'] as $status => $label)
+                                    <form action="{{ route('admin.registrations.status', $registration) }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="status" value="{{ $status }}">
+                                        <button type="submit" class="btn btn-{{ $status === 'approved' ? 'success' : 'danger' }} btn-sm">
+                                            {{ $label }}
+                                        </button>
+                                    </form>
+                                @endforeach
+                            </div>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="empty-table">No membership requests awaiting review.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- PENDING PAYMENT CONFIRMATIONS -->
+<div class="dashboard-section-heading mt-4" id="pending-payments">
+    <h3>Payment Confirmations</h3>
+    <span>Verify or reject member payment proofs</span>
+</div>
+
+<div class="dashboard-panel admin-table-panel">
+    <div class="table-responsive">
+        <table class="table admin-member-table align-middle">
+            <thead>
+                <tr>
+                    <th>Member</th>
+                    <th>Package</th>
+                    <th>Amount</th>
+                    <th>Method / Proof</th>
+                    <th>Review</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($pendingPayments as $payment)
+                    <tr>
+                        <td>{{ $payment->registration->user->name }}<br><small>{{ $payment->registration->user->email }}</small></td>
+                        <td>{{ $payment->registration->package->name }}</td>
+                        <td>Rp{{ number_format((float) $payment->amount, 0, ',', '.') }}</td>
+                        <td>
+                            {{ ucwords(str_replace('_', ' ', $payment->payment_method)) }}<br>
+                            <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" rel="noopener">Download proof</a>
+                        </td>
+                        <td>
+                            <form action="{{ route('admin.payments.status', $payment) }}" method="POST" class="d-grid gap-2">
+                                @csrf
+                                <input type="text" name="notes" class="form-control form-control-sm" placeholder="Optional note for member">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" name="status" value="verified" class="btn btn-success btn-sm">Verify</button>
+                                    <button type="submit" name="status" value="rejected" class="btn btn-danger btn-sm">Reject</button>
+                                </div>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" class="empty-table">No payment confirmations awaiting review.</td></tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <!-- MEMBER TABLE -->
 <div class="dashboard-section-heading">
@@ -198,9 +356,7 @@
                         <td>{{ $member->created_at->format('d M Y') }}</td>
 
                         <td>
-                            <span class="account-status">
-                                Registered
-                            </span>
+                            <span class="account-status">{{ ucfirst($member->approval_status) }}</span>
                         </td>
                     </tr>
 

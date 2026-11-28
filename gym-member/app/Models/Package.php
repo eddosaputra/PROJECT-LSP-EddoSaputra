@@ -8,11 +8,21 @@ class Package extends Model
 {
     protected $fillable = [
         'name',
-        'duration',
+        'duration_days',
         'price',
         'description',
-        'is_active'
+        'image',
+        'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'duration_days' => 'integer',
+            'price' => 'decimal:2',
+            'is_active' => 'boolean',
+        ];
+    }
 
     public function registrations()
     {
