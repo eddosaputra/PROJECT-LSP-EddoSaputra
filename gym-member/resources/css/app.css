@@ -902,6 +902,69 @@ a {
     background: rgba(230, 57, 70, 0.12);
     color: #e63946;
     border-left: 3px solid #e63946;
+    font-weight: 700;
+}
+
+.login-announcement-toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    z-index: 2000;
+    width: calc(100% - 32px);
+    max-width: 620px;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+    padding: 18px 22px;
+    color: #fff;
+    background: #171717;
+    border: 1px solid #e63946;
+    border-left-width: 5px;
+    border-radius: 8px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55);
+    transform: translateX(-50%);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.login-announcement-toast.is-hiding {
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50%, -12px);
+}
+
+.login-announcement-toast-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    color: #e63946;
+}
+
+.login-announcement-toast-header button {
+    padding: 0 4px;
+    color: #aaa;
+    background: transparent;
+    border: 0;
+    font-size: 24px;
+    line-height: 1;
+}
+
+.login-announcement-toast-header button:hover {
+    color: #fff;
+}
+
+.login-announcement-item {
+    padding-top: 14px;
+}
+
+.login-announcement-item h3 {
+    margin-bottom: 5px;
+    font-size: 20px;
+}
+
+.login-announcement-item p {
+    margin: 0;
+    color: #ccc;
+    line-height: 1.6;
 }
 
 .sidebar-bottom {
@@ -975,6 +1038,56 @@ a {
     color: white;
     border-radius: 50%;
     font-weight: 800;
+}
+
+.topbar-avatar-image {
+    object-fit: cover;
+    background: transparent;
+}
+
+.profile-edit-form {
+    max-width: 900px;
+}
+
+.profile-photo-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.profile-photo-preview,
+.profile-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    flex: 0 0 120px;
+    border-radius: 50%;
+}
+
+.profile-photo-preview {
+    object-fit: cover;
+    border: 2px solid #e63946;
+}
+
+.profile-photo-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #e63946, #651c24);
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.profile-photo-control {
+    flex: 1 1 280px;
+}
+
+.profile-photo-small {
+    width: 64px;
+    height: 64px;
+    flex-basis: 64px;
+    font-size: 24px;
 }
 
 .topbar-user-info {

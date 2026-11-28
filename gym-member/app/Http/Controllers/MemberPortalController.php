@@ -63,12 +63,12 @@ class MemberPortalController extends Controller
 
         if (! $created) {
             return back()->withErrors([
-                'package_id' => 'Anda sudah memiliki pemesanan yang belum selesai atau membership aktif.',
+                'package_id' => 'You already have a pending request, an approved order awaiting payment, or an active membership.',
             ]);
         }
 
         return redirect()->route('member.dashboard')
-            ->with('success', 'Pemesanan membership berhasil dikirim dan menunggu persetujuan admin.');
+            ->with('success', 'Membership request submitted successfully. It is awaiting admin approval.');
     }
 
     public function storePayment(Request $request, Registration $registration)
@@ -78,16 +78,23 @@ class MemberPortalController extends Controller
 
         if ($registration->status !== 'approved') {
             return back()->withErrors([
-                'payment' => 'Pembayaran hanya dapat dikonfirmasi untuk pemesanan yang sudah disetujui.',
+                'payment' => 'Payment can only be submitted for approved membership requests.',
             ]);
         }
 
         $validated = $request->validate([
             'payment_method' => ['required', Rule::in(['bank_transfer', 'e_wallet', 'cash'])],
-            'proof_image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            'proof_image' => [
+                Rule::requiredIf(fn () => $request->input('payment_method') !== 'cash'),
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:5120',
+            ],
         ]);
+        $proofImage = $validated['proof_image'] ?? null;
 
-        $created = DB::transaction(function () use ($registration, $user, $validated) {
+        $created = DB::transaction(function () use ($registration, $user, $validated, $proofImage) {
             $registration = Registration::query()->lockForUpdate()->findOrFail($registration->id);
 
             if ($registration->user_id !== $user->id
@@ -97,7 +104,7 @@ class MemberPortalController extends Controller
             }
 
             $registration->load('package');
-            $proofPath = $validated['proof_image']->store('payment-proofs', 'local');
+            $proofPath = $proofImage?->store('payment-proofs', 'local');
 
             Payment::create([
                 'registration_id' => $registration->id,
@@ -113,12 +120,12 @@ class MemberPortalController extends Controller
 
         if (! $created) {
             return back()->withErrors([
-                'payment' => 'Konfirmasi pembayaran tidak dapat dikirim karena pemesanan sudah berubah atau pembayaran telah diproses.',
+                'payment' => 'Payment confirmation could not be submitted because the order status changed or the payment has already been processed.',
             ]);
         }
 
         return redirect()->route('member.dashboard')
-            ->with('success', 'Konfirmasi pembayaran berhasil dikirim dan menunggu verifikasi admin.');
+            ->with('success', 'Payment confirmation submitted successfully. It is awaiting admin verification.');
     }
 
     private function member(): User

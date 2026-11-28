@@ -25,7 +25,7 @@ class PackageController extends Controller
         Package::create($validated);
 
         return redirect()->route('admin.packages.index')
-            ->with('success', 'Paket membership berhasil ditambahkan.');
+            ->with('success', 'Membership package added successfully.');
     }
 
     public function edit(Package $package)
@@ -44,7 +44,7 @@ class PackageController extends Controller
         $package->update($validated);
 
         return redirect()->route('admin.packages.index')
-            ->with('success', 'Paket membership berhasil diperbarui.');
+            ->with('success', 'Membership package updated successfully.');
     }
 
     public function toggleStatus(Package $package)
@@ -53,7 +53,7 @@ class PackageController extends Controller
         $package->update(['is_active' => ! $package->is_active]);
 
         return redirect()->route('admin.packages.index')
-            ->with('success', 'Status paket berhasil diperbarui.');
+            ->with('success', 'Package availability updated successfully.');
     }
 
     private function validatePackage(Request $request): array

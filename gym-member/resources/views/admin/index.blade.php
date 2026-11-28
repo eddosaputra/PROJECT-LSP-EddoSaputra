@@ -92,14 +92,14 @@
 
 <div class="admin-action-grid">
 
-    <a href="{{ route('admin.dashboard') }}#pending-registrations" class="admin-action-card">
+    <a href="{{ route('admin.members.index') }}" class="admin-action-card">
         <div class="admin-action-icon">
             <i class="bi bi-person-plus"></i>
         </div>
 
         <div>
             <h4>Manage Members</h4>
-            <p>View and manage member accounts</p>
+            <p>Edit or remove member accounts</p>
         </div>
 
         <i class="bi bi-arrow-up-right action-arrow"></i>
@@ -284,7 +284,11 @@
                         <td>Rp{{ number_format((float) $payment->amount, 0, ',', '.') }}</td>
                         <td>
                             {{ ucwords(str_replace('_', ' ', $payment->payment_method)) }}<br>
-                            <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" rel="noopener">Download proof</a>
+                            @if($payment->proof_image)
+                                <a href="{{ route('admin.payments.proof', $payment) }}" target="_blank" rel="noopener">Download proof</a>
+                            @else
+                                <span class="text-secondary">No proof image provided</span>
+                            @endif
                         </td>
                         <td>
                             <form action="{{ route('admin.payments.status', $payment) }}" method="POST" class="d-grid gap-2">
@@ -315,9 +319,12 @@
 
     <div class="admin-table-header">
         <h4>Member Accounts</h4>
-        <span class="table-count">
-            {{ \App\Models\User::where('role', 'member')->count() }} members
-        </span>
+        <div class="d-flex align-items-center gap-3">
+            <span class="table-count">
+                {{ \App\Models\User::where('role', 'member')->count() }} members
+            </span>
+            <a href="{{ route('admin.members.index') }}" class="btn btn-outline-light btn-sm">Manage all</a>
+        </div>
     </div>
 
     <div class="table-responsive">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Announcement;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,7 +27,7 @@ class AuthController extends Controller
         if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             return back()
                 ->withErrors([
-                    'email' => 'Email atau password salah.',
+                    'email' => 'Invalid email or password.',
                 ])
                 ->onlyInput('email');
         }
@@ -37,8 +38,8 @@ class AuthController extends Controller
 
         if ($user->role === 'member' && $user->approval_status !== 'approved') {
             $statusMessage = $user->approval_status === 'rejected'
-                ? 'Pendaftaran akun Anda ditolak oleh admin.'
-                : 'Akun Anda masih menunggu persetujuan admin.';
+                ? 'Your member registration was rejected by an administrator.'
+                : 'Your account is awaiting administrator approval.';
 
             Auth::logout();
             $request->session()->invalidate();
@@ -53,7 +54,18 @@ class AuthController extends Controller
         }
 
         if ($user->role === 'member') {
-            return redirect()->route('member.dashboard');
+            $announcements = Announcement::where('is_published', true)
+                ->latest()
+                ->take(5)
+                ->get(['title', 'content'])
+                ->map(fn (Announcement $announcement): array => [
+                    'title' => $announcement->title,
+                    'content' => $announcement->content,
+                ])
+                ->all();
+
+            return redirect()->route('member.dashboard')
+                ->with('login_announcements', $announcements);
         }
 
         Auth::logout();
@@ -62,7 +74,7 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login')
-            ->withErrors(['email' => 'Role akun tidak valid.']);
+            ->withErrors(['email' => 'This account has an invalid role.']);
     }
 
     // Menampilkan halaman register
@@ -99,7 +111,7 @@ class AuthController extends Controller
         ]);
 
         return redirect()->route('login')
-            ->with('success', 'Pendaftaran berhasil dan sedang menunggu persetujuan admin.');
+            ->with('success', 'Registration submitted successfully. Please wait for an administrator to approve your account.');
     }
 
     // Logout

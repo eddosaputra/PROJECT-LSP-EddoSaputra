@@ -104,7 +104,7 @@
                     style="width: 100%; height: 335px; object-fit: cover;"
                 >
                     <source src="{{ asset('videos/gym-member.mp4') }}" type="video/mp4">
-                    Browser Anda tidak mendukung pemutaran video.
+                    Your browser does not support video playback.
                 </video>
             </div>
 
@@ -161,7 +161,7 @@
                 MEMBERSHIP PLAN
             </span>
 
-            <h2 class="display-4 mt-2">
+            <h2 class="display-4 mt-2 text-white">
                 CHOOSE YOUR <span class="text-red">PLAN</span>
             </h2>
 
@@ -174,7 +174,7 @@
         <div class="row g-4">
             @forelse($packages as $package)
                 <div class="col-md-4">
-                    <div class="gym-card rounded p-4 h-100">
+                    <div class="gym-card rounded p-4 h-100 text-white">
                         <h3>{{ $package->name }}</h3>
 
                         @if($package->description)

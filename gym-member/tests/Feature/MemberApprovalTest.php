@@ -21,7 +21,10 @@ class MemberApprovalTest extends TestCase
         ]);
 
         $response->assertRedirect(route('login'));
-        $response->assertSessionHas('success');
+        $response->assertSessionHas(
+            'success',
+            'Registration submitted successfully. Please wait for an administrator to approve your account.'
+        );
         $this->assertGuest();
         $this->assertDatabaseHas('users', [
             'email' => 'new-member@example.com',
@@ -40,8 +43,8 @@ class MemberApprovalTest extends TestCase
         ]);
 
         foreach ([
-            [$pending, 'menunggu persetujuan'],
-            [$rejected, 'ditolak'],
+            [$pending, 'awaiting administrator approval'],
+            [$rejected, 'rejected by an administrator'],
         ] as [$user, $message]) {
             $response = $this->post(route('login.process'), [
                 'email' => $user->email,

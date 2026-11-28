@@ -26,7 +26,7 @@ class AnnouncementController extends Controller
         Announcement::create($validated);
 
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Pengumuman berhasil ditambahkan.');
+            ->with('success', 'Announcement created successfully.');
     }
 
     public function edit(Announcement $announcement)
@@ -45,7 +45,7 @@ class AnnouncementController extends Controller
         $announcement->update($validated);
 
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Pengumuman berhasil diperbarui.');
+            ->with('success', 'Announcement updated successfully.');
     }
 
     public function destroy(Announcement $announcement)
@@ -54,7 +54,7 @@ class AnnouncementController extends Controller
         $announcement->delete();
 
         return redirect()->route('admin.announcements.index')
-            ->with('success', 'Pengumuman berhasil dihapus.');
+            ->with('success', 'Announcement deleted successfully.');
     }
 
     private function validateAnnouncement(Request $request): array

@@ -20,15 +20,15 @@ class AdminWorkflowController extends Controller
 
         if ($registration->status !== 'pending') {
             return back()->withErrors([
-                'registration' => 'Pemesanan ini sudah diproses sebelumnya.',
+                'registration' => 'This membership request has already been processed.',
             ]);
         }
 
         $registration->update(['status' => $validated['status']]);
 
         $message = $validated['status'] === 'approved'
-            ? 'Pemesanan member berhasil disetujui.'
-            : 'Pemesanan member berhasil ditolak.';
+            ? 'Membership request approved successfully.'
+            : 'Membership request rejected successfully.';
 
         return redirect()->route('admin.dashboard')->with('success', $message);
     }
@@ -73,13 +73,13 @@ class AdminWorkflowController extends Controller
 
         if (! $processed) {
             return back()->withErrors([
-                'payment' => 'Pembayaran tidak dapat diproses karena statusnya sudah berubah atau pemesanan belum disetujui.',
+                'payment' => 'This payment cannot be processed because its status changed or the membership request has not been approved.',
             ]);
         }
 
         $message = $validated['status'] === 'verified'
-            ? 'Pembayaran berhasil diverifikasi dan membership telah diaktifkan.'
-            : 'Pembayaran berhasil ditolak.';
+            ? 'Payment verified and membership activated successfully.'
+            : 'Payment rejected successfully.';
 
         return redirect()->route('admin.dashboard')->with('success', $message);
     }

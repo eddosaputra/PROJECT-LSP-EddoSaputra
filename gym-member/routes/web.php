@@ -6,6 +6,7 @@ use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MemberPortalController;
 use App\Http\Controllers\PackageController;
+use App\Http\Controllers\ProfileController;
 use App\Models\Package;
 use App\Models\Payment;
 use App\Models\Registration;
@@ -43,6 +44,11 @@ Route::post('/logout', [AuthController::class, 'logout'])
 
 // Dashboard
 Route::middleware('auth')->group(function () {
+
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
 
     Route::get('/member/dashboard', [MemberPortalController::class, 'index'])
         ->name('member.dashboard');
@@ -82,6 +88,14 @@ Route::middleware('auth')->group(function () {
         ]);
     })->name('admin.dashboard');
 
+    Route::get('/admin/members', [AdminMemberController::class, 'index'])
+        ->name('admin.members.index');
+    Route::get('/admin/members/{user}/edit', [AdminMemberController::class, 'edit'])
+        ->name('admin.members.edit');
+    Route::put('/admin/members/{user}', [AdminMemberController::class, 'update'])
+        ->name('admin.members.update');
+    Route::delete('/admin/members/{user}', [AdminMemberController::class, 'destroy'])
+        ->name('admin.members.destroy');
     Route::post('/admin/members/{user}/approval', [AdminMemberController::class, 'updateApproval'])
         ->name('admin.members.approval');
 

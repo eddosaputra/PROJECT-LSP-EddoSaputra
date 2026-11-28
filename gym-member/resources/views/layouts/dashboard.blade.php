@@ -14,6 +14,21 @@
 
 <div class="dashboard-layout">
 
+    @if(auth()->user()->role === 'member' && session('login_announcements'))
+        <aside class="login-announcement-toast" data-login-announcements role="alert" aria-live="polite">
+            <div class="login-announcement-toast-header">
+                <strong>FITMEMBER Announcements</strong>
+                <button type="button" data-dismiss-login-announcements aria-label="Close announcement">&times;</button>
+            </div>
+            @foreach(session('login_announcements') as $announcement)
+                <article class="login-announcement-item">
+                    <h3>{{ $announcement['title'] }}</h3>
+                    <p>{{ $announcement['content'] }}</p>
+                </article>
+            @endforeach
+        </aside>
+    @endif
+
     <!-- SIDEBAR -->
     <aside class="dashboard-sidebar">
 
@@ -33,7 +48,12 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('admin.dashboard') }}#pending-members" class="sidebar-link">
+                <a href="{{ route('profile.edit') }}" class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+                    <i class="bi bi-person"></i>
+                    <span>My Profile</span>
+                </a>
+
+                <a href="{{ route('admin.members.index') }}" class="sidebar-link {{ request()->routeIs('admin.members.*') ? 'active' : '' }}">
                     <i class="bi bi-people"></i>
                     <span>Members</span>
                 </a>
@@ -60,17 +80,17 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('member.dashboard') }}#profile" class="sidebar-link">
+                <a href="{{ route('profile.edit') }}" class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
                     <i class="bi bi-person"></i>
                     <span>My Profile</span>
                 </a>
 
-                <a href="{{ route('member.dashboard') }}#payment-history" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#memberships" class="sidebar-link">
                     <i class="bi bi-card-membership"></i>
                     <span>My Membership</span>
                 </a>
 
-                <a href="{{ route('member.dashboard') }}#memberships" class="sidebar-link">
+                <a href="{{ route('member.dashboard') }}#payment-history" class="sidebar-link">
                     <i class="bi bi-credit-card"></i>
                     <span>Payment History</span>
                 </a>
@@ -112,9 +132,17 @@
 
             <div class="topbar-user">
 
-                <div class="topbar-avatar">
-                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
-                </div>
+                @if(auth()->user()->profile_photo_path)
+                    <img
+                        src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(auth()->user()->profile_photo_path) }}"
+                        alt="{{ auth()->user()->name }} profile photo"
+                        class="topbar-avatar topbar-avatar-image"
+                    >
+                @else
+                    <div class="topbar-avatar">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+                @endif
 
                 <div class="topbar-user-info">
                     <strong>{{ auth()->user()->name }}</strong>

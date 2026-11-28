@@ -89,6 +89,39 @@ class MemberWorkflowTest extends TestCase
         $this->assertSame(today()->addDays(30)->toDateString(), $registration->end_date->toDateString());
     }
 
+    public function test_cash_payment_does_not_require_a_proof_image_but_other_methods_do(): void
+    {
+        Storage::fake('local');
+        $member = User::factory()->create(['approval_status' => 'approved']);
+        $package = $this->createPackage();
+        $registration = Registration::create([
+            'user_id' => $member->id,
+            'package_id' => $package->id,
+            'status' => 'approved',
+        ]);
+
+        $this->withoutVite();
+        $this->actingAs($member)
+            ->get(route('member.dashboard'))
+            ->assertOk()
+            ->assertSee('Cash payments do not need an image.');
+
+        $this->actingAs($member)
+            ->post(route('member.payments.store', $registration), [
+                'payment_method' => 'bank_transfer',
+            ])
+            ->assertSessionHasErrors('proof_image');
+
+        $this->post(route('member.payments.store', $registration), [
+            'payment_method' => 'cash',
+        ])->assertRedirect(route('member.dashboard'));
+
+        $payment = Payment::firstOrFail();
+        $this->assertSame('cash', $payment->payment_method);
+        $this->assertNull($payment->proof_image);
+        $this->assertDatabaseCount('payments', 1);
+    }
+
     public function test_member_can_retry_payment_after_rejection(): void
     {
         Storage::fake('local');
@@ -106,6 +139,12 @@ class MemberWorkflowTest extends TestCase
             'payment_method' => 'cash',
             'status' => 'pending',
         ]);
+
+        $this->withoutVite();
+        $this->actingAs($admin)
+            ->get(route('admin.dashboard'))
+            ->assertOk()
+            ->assertSee('No proof image provided');
 
         $this->actingAs($admin)
             ->post(route('admin.payments.status', $payment), [
@@ -147,6 +186,41 @@ class MemberWorkflowTest extends TestCase
             ->assertOk()
             ->assertSee('Published update')
             ->assertDontSee('Draft update');
+    }
+
+    public function test_member_login_shows_published_announcements_once_as_a_dismissible_toast(): void
+    {
+        $member = User::factory()->create(['approval_status' => 'approved']);
+        $admin = User::factory()->create(['role' => 'admin']);
+        Announcement::create([
+            'user_id' => $admin->id,
+            'title' => 'Login announcement',
+            'content' => 'A new class starts Monday.',
+            'is_published' => true,
+        ]);
+        Announcement::create([
+            'user_id' => $admin->id,
+            'title' => 'Draft announcement',
+            'content' => 'This is not published.',
+            'is_published' => false,
+        ]);
+
+        $this->withoutVite()
+            ->post(route('login.process'), [
+                'email' => $member->email,
+                'password' => 'password',
+            ])
+            ->assertRedirect(route('member.dashboard'));
+
+        $this->get(route('member.dashboard'))
+            ->assertOk()
+            ->assertSee('data-login-announcements', false)
+            ->assertSee('Login announcement')
+            ->assertDontSee('Draft announcement');
+
+        $this->get(route('member.dashboard'))
+            ->assertOk()
+            ->assertDontSee('data-login-announcements', false);
     }
 
     public function test_admin_can_approve_or_reject_membership_requests(): void
@@ -238,6 +312,9 @@ class MemberWorkflowTest extends TestCase
             ->get(route('home'))
             ->assertOk()
             ->assertSee($package->name)
+            ->assertSee('CHOOSE YOUR', false)
+            ->assertSee('class="display-4 mt-2 text-white"', false)
+            ->assertSee('class="gym-card rounded p-4 h-100 text-white"', false)
             ->assertSee(route('member.dashboard').'#memberships', false);
     }
 

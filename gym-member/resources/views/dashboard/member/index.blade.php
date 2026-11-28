@@ -13,10 +13,24 @@
 
 <div class="dashboard-panel p-4 mb-4">
     <div class="row g-3">
-        <div class="col-md-4"><strong>Name:</strong> {{ auth()->user()->name }}</div>
+        <div class="col-md-2">
+            @if(auth()->user()->profile_photo_path)
+                <img
+                    src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url(auth()->user()->profile_photo_path) }}"
+                    alt="{{ auth()->user()->name }} profile photo"
+                    class="profile-photo-preview profile-photo-small"
+                >
+            @else
+                <div class="profile-photo-placeholder profile-photo-small">
+                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                </div>
+            @endif
+        </div>
+        <div class="col-md-3"><strong>Name:</strong> {{ auth()->user()->name }}</div>
         <div class="col-md-4"><strong>Email:</strong> {{ auth()->user()->email }}</div>
-        <div class="col-md-4"><strong>Phone:</strong> {{ auth()->user()->phone ?: '-' }}</div>
+        <div class="col-md-3"><strong>Phone:</strong> {{ auth()->user()->phone ?: '-' }}</div>
     </div>
+    <a href="{{ route('profile.edit') }}" class="btn btn-outline-light btn-sm mt-3">Edit profile</a>
 </div>
 
 <div class="admin-stat-grid">
@@ -77,7 +91,7 @@
     @elseif(! $canBook)
         <p class="mb-0">You already have a pending request, an approved order awaiting payment, or an active membership.</p>
     @else
-        <p class="mb-0">Belum ada paket membership aktif. Hubungi admin agar menambahkan paket sebelum Anda memesan.</p>
+        <p class="mb-0">There are no active membership packages yet. Please contact an administrator to add one before placing an order.</p>
     @endif
 </div>
 
@@ -122,23 +136,26 @@
                     @if($registration->status === 'approved' && (! $latestPayment || $latestPayment->status === 'rejected'))
                         <tr>
                             <td colspan="5">
-                                <form action="{{ route('member.payments.store', $registration) }}" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end">
+                                <form action="{{ route('member.payments.store', $registration) }}" method="POST" enctype="multipart/form-data" class="row g-3 align-items-end" data-payment-form>
                                     @csrf
                                     <div class="col-md-3">
                                         <label class="form-label">Payment method</label>
-                                        <select name="payment_method" class="form-select" required>
+                                        <select name="payment_method" class="form-select" data-payment-method required>
                                             <option value="">Select method</option>
                                             <option value="bank_transfer">Bank transfer</option>
                                             <option value="e_wallet">E-wallet</option>
                                             <option value="cash">Cash</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" data-payment-proof-field>
                                         <label class="form-label">Payment proof (JPG, PNG, WEBP; max 5 MB)</label>
-                                        <input type="file" name="proof_image" class="form-control" accept=".jpg,.jpeg,.png,.webp" required>
+                                        <input type="file" name="proof_image" class="form-control" accept=".jpg,.jpeg,.png,.webp" data-payment-proof>
                                     </div>
                                     <div class="col-md-3">
                                         <button type="submit" class="btn btn-danger w-100">Submit payment confirmation</button>
+                                    </div>
+                                    <div class="col-12">
+                                        <small class="text-secondary">A proof image is required for bank transfer and e-wallet. Cash payments do not need an image.</small>
                                     </div>
                                     @error('payment')
                                         <div class="col-12 text-danger">{{ $message }}</div>
