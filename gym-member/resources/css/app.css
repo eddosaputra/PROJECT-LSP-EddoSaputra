@@ -820,6 +820,62 @@ a {
     font-family: 'Inter', sans-serif;
 }
 
+.dashboard-body .form-control,
+.dashboard-body .form-select {
+    color: #f5f5f5 !important;
+    background-color: #171717 !important;
+    border-color: #3a3a3a !important;
+    color-scheme: dark;
+}
+
+.dashboard-body .form-control:focus,
+.dashboard-body .form-select:focus {
+    color: #fff !important;
+    background-color: #171717 !important;
+    border-color: #e63946 !important;
+    box-shadow: 0 0 0 0.2rem rgba(230, 57, 70, 0.2) !important;
+}
+
+.dashboard-body .form-control::placeholder {
+    color: #a3a3a3 !important;
+    opacity: 1;
+}
+
+.dashboard-body .form-control::file-selector-button {
+    color: #fff !important;
+    background-color: #292929 !important;
+    border: 0;
+    border-right: 1px solid #3a3a3a;
+}
+
+.dashboard-body .form-control:hover:not(:disabled):not([readonly])::file-selector-button {
+    background-color: #353535 !important;
+}
+
+.dashboard-body .form-select {
+    --bs-form-select-bg-img: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f5f5f5' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.dashboard-body .form-select option {
+    color: #f5f5f5;
+    background-color: #171717;
+}
+
+.dashboard-body .form-check-input {
+    background-color: #171717;
+    border-color: #666;
+}
+
+.dashboard-body .form-check-input:checked {
+    background-color: #e63946;
+    border-color: #e63946;
+}
+
+.dashboard-body .form-check-input:focus {
+    border-color: #e63946;
+    box-shadow: 0 0 0 0.2rem rgba(230, 57, 70, 0.2);
+}
+
 .dashboard-layout {
     display: flex;
     min-height: 100vh;
